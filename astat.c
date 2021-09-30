@@ -6,7 +6,7 @@
 #include <errno.h>
 #include <unistd.h>
 
-float tipe(struct stat st)
+int tipe(struct stat st)
 {
   char t;
   switch (st.st_mode & S_IFMT) {
