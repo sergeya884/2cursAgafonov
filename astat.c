@@ -6,26 +6,23 @@
 #include <errno.h>
 #include <unistd.h>
 
-int tipe(struct stat st)
+const char tipe(unsigned mod)
 {
-  char t;
-  switch (st.st_mode & S_IFMT) {
-    case S_IFBLK:  t='b'; break;
-    case S_IFCHR:  t='c'; break;
-    case S_IFDIR:  t='d'; break;
-    case S_IFIFO:  t='p'; break;
-    case S_IFLNK:  t='l'; break;
-    case S_IFREG:  t='-'; break;
-    case S_IFSOCK: t='s'; break;
-    default:       t='?'; break;
+  switch (mod & S_IFMT) {
+    case S_IFBLK:  return 'b';
+    case S_IFCHR:  return 'c';
+    case S_IFDIR:  return 'd';
+    case S_IFIFO:  return 'p';
+    case S_IFLNK:  return 'l';
+    case S_IFREG:  return '-';
+    case S_IFSOCK: return 's';
+    default:       return '?';
     }
-  return(t);
 }
 
 
 int main(int argc, char *argv[])
 {
-    char t;
     char buf [80]; 
     struct stat st;
     if (argc != 2) {
@@ -36,11 +33,11 @@ int main(int argc, char *argv[])
         perror("F to stat");
         exit(EXIT_FAILURE);
     }
-    t=tipe(st);
-    printf("Тип файла:                %c\n", t);
+
+    printf("Тип файла:                %c\n", tipe(st. st_mode));
     printf("номер inode:              %ld\n", (long) st.st_ino);
     long i = st.st_mode; //Права доступа в числах
-    printf("Режим доступа:            %lo/%c", i, t);
+    printf("Режим доступа:            %lo/%c", i, tipe(st. st_mode));
     //Перевод прав доступа из чисел в буквы
     for(int j=512; j>1; j/=8) {
         i%=j;
