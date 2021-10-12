@@ -2,7 +2,10 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <stdio.h>
-#include <unistd.h> 
+#include <unistd.h>
+#include <string.h> 
+
+
 
 int main(int argc, char *argv[])
 {
@@ -15,8 +18,16 @@ int main(int argc, char *argv[])
 		perror("Failed to open file for writing");
 		return 2;
 	}
-	if(write(fd, argv[2], sizeof(argv[2])) !=sizeof(argv[2]))
-		printf("Write Error");
+        size_t written = 0;
+	size_t len = strlen(argv[2]);
+	while(written<len){
+		size_t path = write(fd,argv[2]+written,len-written);
+		if(path <0) {
+			break;
+			printf("Write Error");	
+		}
+		written+=path;
+	}
 
 	if (close(fd)<0){
 		perror("Failure write closing fd");
