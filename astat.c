@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <errno.h>
 #include <unistd.h>
+#include "functions.h"
 
 const char tipe(unsigned mod)
 {
@@ -20,6 +21,20 @@ const char tipe(unsigned mod)
     }
 }
 
+void file_access(long i) {
+	//long i = st.st_mode;
+	for(int j=512; j>1; j/=8) {
+        	i%=j;
+        	if (i/(j/8)==1) printf("--x");
+		else if (i/(j/8)==2) printf("-w-");
+		else if (i/(j/8)==3) printf("-wx");
+		else if (i/(j/8)==4) printf("r--");
+		else if (i/(j/8)==5) printf("r-x");
+		else if (i/(j/8)==6) printf("rw-");
+		else if (i/(j/8)==7) printf("rwx");
+	    
+	}
+}
 
 int main(int argc, char *argv[])
 {
@@ -34,21 +49,12 @@ int main(int argc, char *argv[])
         exit(EXIT_FAILURE);
     }
 
-    printf("Тип файла:                %c\n", tipe(st. st_mode));
+    printf("Тип файла:                %c\n", tipe(st.st_mode));
     printf("номер inode:              %ld\n", (long) st.st_ino);
     long i = st.st_mode; //Права доступа в числах
     printf("Режим доступа:            %lo/%c", i, tipe(st. st_mode));
     //Перевод прав доступа из чисел в буквы
-    for(int j=512; j>1; j/=8) {
-        i%=j;
-        if (i/(j/8)==1) printf("--x");
-        else if (i/(j/8)==2) printf("-w-");
-        else if (i/(j/8)==3) printf("-wx");
-        else if (i/(j/8)==4) printf("r--");
-        else if (i/(j/8)==5) printf("r-x");
-        else if (i/(j/8)==6) printf("rw-");
-        else if (i/(j/8)==7) printf("rwx");
-    }
+    file_access(i);   
 
     printf("\nКол-во ссылок:            %ld\n", (long) st.st_nlink);
     printf("Владелец:                 UID=%ld   GID=%ld\n", (long) st.st_uid, (long) st.st_gid);
