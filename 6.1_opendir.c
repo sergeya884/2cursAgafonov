@@ -5,8 +5,6 @@
 #include <unistd.h>
 #include <assert.h>
 
-
-//unsigned int BUF_SIZE = 32;
 //Перевод прав доступа из чисел в буквы
 void file_access(long i) {
 	for(int j=512; j>1; j/=8) {
@@ -41,14 +39,14 @@ const char tipe(unsigned mod)
 char dtype(unsigned char dtype) {
 
     switch (dtype) {
-        case DT_BLK:      return 'b'; break; 
-        case DT_CHR:      return 'c'; break;
-        case DT_DIR:      return 'd'; break;
-        case DT_FIFO:     return 'f'; break;
-        case DT_LNK:      return 'l'; break;
-        case DT_REG:      return 'r'; break;
-        case DT_SOCK:     return 's'; break;
-        case DT_UNKNOWN:  return '?'; break;
+        case DT_BLK:      return 'b'; 
+        case DT_CHR:      return 'c'; 
+        case DT_DIR:      return 'd';
+        case DT_FIFO:     return 'f';
+        case DT_LNK:      return 'l'; 
+        case DT_REG:      return 'r';
+        case DT_SOCK:     return 's';
+        case DT_UNKNOWN:  return '?';
     }
 
     return '?';
@@ -56,16 +54,16 @@ char dtype(unsigned char dtype) {
 
 
 int main() {
-    DIR *dir_fd = opendir(".");
+    DIR *dir = opendir(".");
 
-    if (!dir_fd) {
+    if (!dir) {
         perror("Can't open current directory");
         return 1;
     }
 
     struct dirent* entry;
 
-    while ((entry = readdir(dir_fd)) != NULL) {
+    while ((entry = readdir(dir)) != NULL) {
 
         char entry_type = dtype(entry->d_type);
 
@@ -78,9 +76,9 @@ int main() {
             entry_type = tipe(sb.st_mode);
         }
 
-        printf("%c %s\n", entry_type, entry->d_name);
+        printf(" %c %s\n", entry_type, entry->d_name);
     }
 
-    closedir(dir_fd);
+    closedir(dir);
     return 0;
 }
