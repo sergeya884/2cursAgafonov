@@ -1,56 +1,63 @@
-#include <unistd.h> // for read
+//Программа копирует содержимое одного файла в другой блоками, так же копирует права доступа
+#include <unistd.h> 
 #include <stdio.h>
 #include <fcntl.h>
 #include <stdlib.h>
-#include <fcntl.h> /* Definition of AT_* constants */
+#include <fcntl.h> 
 #include <sys/stat.h>
-
-//
-
-// read()
-// ssize_t read(int fd, void *buf, size_t count);
-// returns number of bites(file posision) on success
-// and -1 if smth wrong
-// read() attempts to read up to count bytes from file descriptor fd into the buffer starting at buf.
 
 int main(int argc, char *argv[])
 {
-	//Int fd1, fd2, metadata, f;
-	char buffer[100000] = "";
-	unsigned int bytes;
+	if (argc != 3) {
+		fprintf(stderr, "Usage: %s <read-filename> <write-filename>\n", argv[0]);
+		exit(1);
+	}
+
+	int rf, wf;
+	char buffer[100];
 	struct stat sb;
 
-	scanf("%u", &bytes);
-	int fd1 = open(argv[1], O_RDONLY, 0644);
-	int fd2 = open(argv[2], O_WRONLY | O_CREAT | O_TRUNC, 0644);
-	bytes = read(fd1, buffer, bytes);
-	int f = fstat(fd1, &sb); 
-	int metadata = fchmod(fd2, sb.st_mode);
-	unsigned int bytes_out = write(fd2, buffer, bytes);
+	if ((rf=open(argv[1], O_RDONLY, 0644<0))<0) {	
+		perror("Cannot open file for reading");
+		exit(2);
+	}
 	
-	if(fd1 == -1) {
-	perror("Ошибка открытия файла");
-	exit(1);
-	}
-	if(fd2 == -1) {
-	perror("Ошибка открытия файла");
-	exit(1);
-	}
-	if(metadata == -1) {
-	printf("Ошибка копирования метаданных");
-	exit(1);
-	}
-	if (bytes == -1){
-	perror ("Possible read error.");
-	exit(1);
-	}
-	if(bytes_out == -1){
-	perror("Write Error");
-	exit(1);
+	if ((wf = open(argv[2], O_WRONLY | O_CREAT | O_TRUNC, 0644))<0) {
+		perror("Failed to open file for writing");
+		exit(3);
 	}
 
-	close(fd1);
-	close(fd2);
+	if(fstat(rf, &sb)<0) {
+		perror("F to fstat");
+		exit(4);
+		}
+ 
+	if(fchmod(wf, sb.st_mode)<0){
+		perror("F to fchmod");
+		exit(5);
+		}
+
+	size_t i = 50;
+	while(i == 50){
+		i = read(rf, buffer, 50);
+		if (i<0) {
+			perror("Read Error");
+			exit(6);
+		}
+	        if (write(wf,buffer,i)<=0){
+			perror("Write Error");	
+			exit(7);
+		}
+	}
+
+	if (close(rf)<0){
+		perror("Failure write closing rf");
+		exit(8);
+	}
+	if (close(wf)<0){
+		perror("Failure write closing wf");
+		exit(9);
+	}
 
 	return 0;
 }
