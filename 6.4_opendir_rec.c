@@ -7,7 +7,7 @@
 #include <string.h>
 /*
 //Перевод прав доступа из чисел в буквы
-void file_access(long i) {
+void file_access(int i) {
 	for(int j=512; j>1; j/=8) {
         	i%=j;
         	if (i/(j/8)==1) printf("--x");
