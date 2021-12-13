@@ -1,13 +1,12 @@
-//Программа получает на вход абсолютный путь до директории и выводит права доступа и тип всех файлов в ней
+//Программа получает на вход абсолютный путь до директории и выводит /*права доступа и*/ тип всех файлов в ней
 #include <stdio.h>
 #include <dirent.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
-#include <assert.h>
-
+/*
 //Перевод прав доступа из чисел в буквы
-void file_access(long i) {
+void file_access(int i) {
 	for(int j=512; j>1; j/=8) {
         	i%=j;
         	if (i/(j/8)==1) printf("--x");
@@ -20,7 +19,7 @@ void file_access(long i) {
 	    
 	}
 }
-
+*/
 //Нахождение типа файлов
 const char tipe(unsigned mod)
 {
@@ -36,7 +35,6 @@ const char tipe(unsigned mod)
 	}
 }
 
-//Тип директории
 char dtype(unsigned char dtype) {
 
 	switch (dtype) {
@@ -56,7 +54,7 @@ char dtype(unsigned char dtype) {
 
 int main(int argc, char *argv[]) {
 	if (argc != 2) {
-		fprintf(stderr, "Usage: %s directorypath\n", argv[0]);
+		fprintf(stderr, "Usage: %s <directorypath>\n", argv[0]);
 		return 1;
 	}
 	//Переходим в нужную директорию
@@ -79,9 +77,11 @@ int main(int argc, char *argv[]) {
 		char entry_type = dtype(entry->d_type);
 
 		struct stat sb;
-		assert((lstat(entry->d_name, &sb)) == 0);
-
-		file_access(sb.st_mode);
+		if (lstat(entry->d_name, &sb)<0) {
+			perror("F to stat");
+      			return 1;
+		}
+		//file_access(sb.st_mode);
         
 		if (entry_type == '?') entry_type = tipe(sb.st_mode);
 
