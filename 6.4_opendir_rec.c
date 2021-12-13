@@ -1,11 +1,11 @@
-//Программа получает на вход абсолютный путь до директории и рекурсивно выводит права доступа и тип всех файлов в ней и во всех директориях внутри нее
+//Программа получает на вход абсолютный путь до директории и рекурсивно выводит /*права доступа и*/ тип всех файлов в ней и во всех директориях внутри нее
 #include <stdio.h>
 #include <dirent.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
 #include <string.h>
-
+/*
 //Перевод прав доступа из чисел в буквы
 void file_access(long i) {
 	for(int j=512; j>1; j/=8) {
@@ -20,7 +20,7 @@ void file_access(long i) {
 	    
 	}
 }
-
+*/
 //Нахождение типа файлов
 const char tipe(unsigned mod)
 {
@@ -66,17 +66,17 @@ int rec_chek(char *name, int tire, char *path){
 	}
 
 	struct dirent* entry;
-
+	//Пока есть файлы
 	while((entry = readdir(dir)) != NULL) {
-		for(int j=0; j<tire; ++j) printf("----");
+		for(int j=0; j<tire; ++j) printf("----"); //Выводим необходимое количество тире для читаемости структуры 
 		printf("/ ");
 		char entry_type = dtype(entry->d_type);
 		struct stat sb;
 		lstat(entry->d_name, &sb);
-		file_access(sb.st_mode);
+		//file_access(sb.st_mode);
 		if (entry_type == '?') entry_type = tipe(sb.st_mode);
 		printf(" %c %s\n", entry_type, entry->d_name);
-		
+		//Если это дирректория и не "." или "..", то переходим в нее
 		if ((entry_type == 'd') && (strcmp(entry->d_name,"..") != 0) && (strcmp(entry->d_name,".") != 0)){			
 			rec_chek(entry->d_name, tire+1, path);
 		}
