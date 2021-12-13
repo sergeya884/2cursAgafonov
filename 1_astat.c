@@ -5,7 +5,7 @@
 #include <stdlib.h>
 #include <errno.h>
 #include <unistd.h>
-#include "functions.h"
+//#include "functions.h"
 
 const char tipe(unsigned mod)
 {
@@ -21,18 +21,18 @@ const char tipe(unsigned mod)
     }
 }
 
-void file_access(long i) {
-	//long i = st.st_mode;
+void file_access(int i) {
 	for(int j=512; j>1; j/=8) {
         	i%=j;
-        	if (i/(j/8)==1) printf("--x");
-		else if (i/(j/8)==2) printf("-w-");
-		else if (i/(j/8)==3) printf("-wx");
-		else if (i/(j/8)==4) printf("r--");
-		else if (i/(j/8)==5) printf("r-x");
-		else if (i/(j/8)==6) printf("rw-");
-		else if (i/(j/8)==7) printf("rwx");
-	    
+		switch (i/(j/8)) {
+	        	case 1: printf("--x"); break;
+			case 2: printf("-w-"); break;
+			case 3: printf("-wx"); break;
+			case 4: printf("r--"); break;
+			case 5: printf("r-x"); break;
+			case 6: printf("rw-"); break;
+			case 7: printf("rwx"); break;
+		}
 	}
 }
 
@@ -41,7 +41,7 @@ int main(int argc, char *argv[])
     char buf [80]; 
     struct stat st;
     if (argc != 2) {
-        fprintf(stderr, "Usage: %s <pathname>\n", argv[0]);//переделал под шаблон
+        fprintf(stderr, "Usage: %s <pathname>\n", argv[0]);
         exit(EXIT_FAILURE);
     }
     if (lstat(argv[1], &st) == -1) {
@@ -51,11 +51,10 @@ int main(int argc, char *argv[])
 
     printf("Тип файла:                %c\n", tipe(st.st_mode));
     printf("номер inode:              %ld\n", (long) st.st_ino);
-    long i = st.st_mode; //Права доступа в числах
-    printf("Режим доступа:            %lo/%c", i, tipe(st. st_mode));
+    int i = st.st_mode; //Права доступа в числах
+    printf("Режим доступа:            %o/%c", i, tipe(st. st_mode));
     //Перевод прав доступа из чисел в буквы
     file_access(i);   
-
     printf("\nКол-во ссылок:            %ld\n", (long) st.st_nlink);
     printf("Владелец:                 UID=%ld   GID=%ld\n", (long) st.st_uid, (long) st.st_gid);
     printf("Предпоч. размер бл. в/в:  %ld байт\n", (long) st.st_blksize);
