@@ -1,42 +1,19 @@
 #include <stdio.h>
 #include <sys/statvfs.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <unistd.h>
-
-//На вход подается файловая система(папака) и файл, выводится информация о файловой системе и поместится ли файл в файловую систему 
+//На вход подается файловая система(папака), выводится информация о файловой системе
 
 int main(int argc, char* argv[]) {
 
 	struct statvfs fs;
 
-	struct stat sb;
-
-	if (argc != 3) {
-		fprintf(stderr, "Usage: %s file-system filename\n", argv[0]);
+	if (argc != 2) {
+		fprintf(stderr, "Usage: %s <file-system>\n", argv[0]);
 		return 1;
-	}
-
-
-	if (lstat(argv[1], &sb) < 0) {
-		perror("F to lstat");
-		return 2;
-	}
-
-	//Проверка соответствия файловой системы
-	if ((sb.st_mode & S_IFMT) != S_IFDIR) {
-		fprintf(stderr, "[err] %s isn't a file system\n", argv[1]);
-		return 3;
 	}
 
 	if (statvfs(argv[1], &fs) < 0) {
 		perror("F to statvfs");
-		return 4;
-	}
-
-	if (lstat(argv[2], &sb) < 0) {
-		perror("F to lstat");
-		return 5;
+		return 2;
 	}
 
 	//Вывод информации о файловой системе
@@ -51,14 +28,6 @@ int main(int argc, char* argv[]) {
 	printf("Filesystem ID:                                  %lu\n", fs.f_fsid);
 	printf("Mount flags:                                    %lu\n", fs.f_flag);
 	printf("Maximum filename length:                        %lu\n", fs.f_namemax);
-
-	//Проверка влезет ли файл
-	if ((fs.f_favail < 1) || ((long int) (fs.f_bavail * fs.f_bsize) < sb.st_size)) {
-		printf("\nThe file will not fit into the folder\n");
-	}
-	else {
-		printf("\nThe file will fit into the folder\n");
-	}
 
 	return 0;
 }
