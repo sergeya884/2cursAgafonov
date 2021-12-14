@@ -21,10 +21,10 @@ int main(int argc, char *argv[])
         size_t written = 0;
 	size_t len = strlen(argv[2]);
 	while(written<len){
-		size_t path = write(fd,argv[2]+written,len-written);
+		ssize_t path = write(fd,argv[2]+written,len-written);
 		if(path <0) {
-			break;
 			printf("Write Error");	
+			break;
 		}
 		written+=path;
 	}
