@@ -10,14 +10,15 @@
 void file_access(int i) {
 	for(int j=512; j>1; j/=8) {
         	i%=j;
-        	if (i/(j/8)==1) printf("--x");
-		else if (i/(j/8)==2) printf("-w-");
-		else if (i/(j/8)==3) printf("-wx");
-		else if (i/(j/8)==4) printf("r--");
-		else if (i/(j/8)==5) printf("r-x");
-		else if (i/(j/8)==6) printf("rw-");
-		else if (i/(j/8)==7) printf("rwx");
-	    
+		switch (i/(j/8)) {
+	        	case 1: printf("--x"); break;
+			case 2: printf("-w-"); break;
+			case 3: printf("-wx"); break;
+			case 4: printf("r--"); break;
+			case 5: printf("r-x"); break;
+			case 6: printf("rw-"); break;
+			case 7: printf("rwx"); break;
+		}
 	}
 }
 */
@@ -70,12 +71,17 @@ int rec_chek(char *name, int tire, char *path){
 	while((entry = readdir(dir)) != NULL) {
 		for(int j=0; j<tire; ++j) printf("----"); //Выводим необходимое количество тире для читаемости структуры 
 		printf("/ ");
+
+		//Определяем тип файла 
 		char entry_type = dtype(entry->d_type);
-		struct stat sb;
-		lstat(entry->d_name, &sb);
-		//file_access(sb.st_mode);
-		if (entry_type == '?') entry_type = tipe(sb.st_mode);
+		//lstat вызывыется только если dtype не опознал
+		if (entry_type == '?') {
+			struct stat sb;
+			lstat(entry->d_name, &sb);
+			entry_type = tipe(sb.st_mode);
+		}
 		printf(" %c %s\n", entry_type, entry->d_name);
+
 		//Если это дирректория и не "." или "..", то переходим в нее
 		if ((entry_type == 'd') && (strcmp(entry->d_name,"..") != 0) && (strcmp(entry->d_name,".") != 0)){			
 			rec_chek(entry->d_name, tire+1, path);
@@ -84,7 +90,7 @@ int rec_chek(char *name, int tire, char *path){
 				
 	}
 	closedir(dir);
-	chdir(path);
+	if (chdir(path)<0) return 1;
 	}
 
 int main(int argc, char *argv[]) {
