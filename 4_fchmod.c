@@ -14,7 +14,7 @@ int main(int argc, char *argv[])
 	}
 
 	int rf, wf;
-	char buffer[100];
+	char buffer[500];
 	struct stat sb;
 
 	if ((rf=open(argv[1], O_RDONLY, 0644<0))<0) {	
@@ -31,25 +31,27 @@ int main(int argc, char *argv[])
 		perror("F to fstat");
 		exit(4);
 		}
- 
+
+	//Переписываем по 500
+	ssize_t i;
+	while(1==1){
+		i = read(rf, buffer, sizeof(buffer));
+		if (i<0) {
+			printf("Read Error");
+			return 4;
+		}
+		if (i==0) break;
+	        if (write(wf,buffer,i)<=0){
+			printf("Write Error");	
+			return 5;
+		}
+	}
+
+	//Копируем права
 	if(fchmod(wf, sb.st_mode)<0){
 		perror("F to fchmod");
 		exit(5);
 		}
-
-	size_t i = 50;
-	while(i == 50){
-		i = read(rf, buffer, 50);
-		if (i<0) {
-			perror("Read Error");
-			exit(6);
-		}
-	        if (write(wf,buffer,i)<=0){
-			perror("Write Error");	
-			exit(7);
-		}
-	}
-
 	if (close(rf)<0){
 		perror("Failure write closing rf");
 		exit(8);
