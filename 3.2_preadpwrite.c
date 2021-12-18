@@ -15,7 +15,7 @@ int main(int argc, char *argv[])
 	}
 	//rf файл для чтения, wf - для записи
 	int rf=open(argv[1], O_RDONLY);
-	char buffer[100];
+	char buffer[500];
 	if(rf <= 0) {
 		printf("Cannot open file for reading");
 		return 2;
@@ -27,20 +27,21 @@ int main(int argc, char *argv[])
 		return 3;
 	}
 
-	//циклически переписываем по 50
+	//циклически переписываем по 500
 	off_t offset=0;
-	size_t i = 50;
-	while(i == 50){
-		i = pread(rf, buffer, 50, offset);
+	ssize_t i;
+	while(1==1){
+		i = pread(rf, buffer, sizeof(buffer), offset);
 		if (i<0) {
 			printf("Read Error");
 			return 4;
 		}
+		if (i==0) break;
 	        if (pwrite(wf,buffer,i, offset)<=0){
 			printf("Write Error");	
 			return 5;
 		}
-		offset+=50;
+		offset+=sizeof(buffer);
 	}
 
 	//закрываем файлы
