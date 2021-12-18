@@ -1,25 +1,10 @@
-//Прогррамма выводит /*права доступа и*/ тип всех файлов в текущем каталоге
+//Прогррамма выводит тип всех файлов в текущем каталоге
 #include <stdio.h>
 #include <dirent.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
-/*
-//Перевод прав доступа из чисел в буквы
-void file_access(int i) {
-	for(int j=512; j>1; j/=8) {
-        	i%=j;
-        	if (i/(j/8)==1)      printf("--x");
-		else if (i/(j/8)==2) printf("-w-");
-		else if (i/(j/8)==3) printf("-wx");
-		else if (i/(j/8)==4) printf("r--");
-		else if (i/(j/8)==5) printf("r-x");
-		else if (i/(j/8)==6) printf("rw-");
-		else if (i/(j/8)==7) printf("rwx");
-	    
-	}
-}
-*/
+
 //Нахождение типа файлов
 const char tipe(unsigned mod)
 {
@@ -64,14 +49,14 @@ int main() {
 
 	while ((entry = readdir(dir)) != NULL) {
 
-		char entry_type = dtype(entry->d_type);
-		struct stat sb;
-		if (lstat(entry->d_name, &sb)<0) {
-			perror("F to stat");
-      			return 1;
+		char entry_type = dtype(entry->d_type); 
+		
+		//lstat вызывыется только если dtype не опознал
+		if (entry_type == '?') {
+			struct stat sb;
+			lstat(entry->d_name, &sb);
+			entry_type = tipe(sb.st_mode);
 		}
-		//file_access(sb.st_mode);
-		if (entry_type == '?') entry_type = tipe(sb.st_mode);
 		printf(" %c %s\n", entry_type, entry->d_name);
 	}
 
