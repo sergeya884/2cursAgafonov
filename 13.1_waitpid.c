@@ -19,10 +19,11 @@ int main(int argc, char *argv[]) {
 			printf("PPID %d,\n", getppid());
 			printf("PGID %d,\n", getpgid(0));
 			printf("SID %d\n\n", getsid(0));
-			if (argc == 1) { //Можно отправить в argv[1] сигнал к завершению
+			if (argc == 2) { //Можно отправить в argv[1] сигнал к завершению
 				pause();
-				_exit(atoi(argv[1]));
+				exit(atoi(argv[1]));
 			}
+			break;
 		default:
 			printf("\nParent\n");
 			printf("PID %d,\n", getpid());
