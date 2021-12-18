@@ -5,8 +5,7 @@
 #include <stdlib.h>
 #include <errno.h>
 #include <unistd.h>
-//#include "functions.h"
-
+                                                                    
 const char tipe(unsigned mod)
 {
   switch (mod & S_IFMT) {
@@ -20,25 +19,19 @@ const char tipe(unsigned mod)
     default:       return '?';
     }
 }
-
-void file_access(int i) {
-	for(int j=512; j>1; j/=8) {
-        	i%=j;
-		switch (i/(j/8)) {
-	        	case 1: printf("--x"); break;
-			case 2: printf("-w-"); break;
-			case 3: printf("-wx"); break;
-			case 4: printf("r--"); break;
-			case 5: printf("r-x"); break;
-			case 6: printf("rw-"); break;
-			case 7: printf("rwx"); break;
-		}
-	}
+//переделал под битовые операции
+void file_access(unsigned mode) {
+	const char *const rwx[] = {
+		"---", "--x", "-w-", "-wx",
+		"r--", "r-x", "rw-", "rwx",
+	};
+	for(int i=6; i>=0; i-=3) printf("%s", rwx[(mode>>i) & 7]);
 }
 
 int main(int argc, char *argv[])
 {
-    char buf [80]; 
+    //Размер буфера вычеслен экперементально, минимальный необходимый
+    char buf [22]; 
     struct stat st;
     if (argc != 2) {
         fprintf(stderr, "Usage: %s <pathname>\n", argv[0]);
@@ -51,7 +44,7 @@ int main(int argc, char *argv[])
 
     printf("Тип файла:                %c\n", tipe(st.st_mode));
     printf("номер inode:              %ld\n", (long) st.st_ino);
-    int i = st.st_mode; //Права доступа в числах
+    unsigned i = st.st_mode; //Права доступа в числах
     printf("Режим доступа:            %o/%c", i, tipe(st. st_mode));
     //Перевод прав доступа из чисел в буквы
     file_access(i);   
@@ -60,12 +53,12 @@ int main(int argc, char *argv[])
     printf("Предпоч. размер бл. в/в:  %ld байт\n", (long) st.st_blksize);
     printf("Размер файла:             %lld байт\n", (long long) st.st_size);
     printf("Выделено блоков:          %lld\n", (long long) st.st_blocks);
-    // переделал под strftime
-    strftime (buf,80,"%x %X %Z",localtime(&st.st_ctime));
+    // вывод времени
+    strftime (buf,sizeof(buf),"%x %X %Z",localtime(&st.st_ctime));
     printf("Посл. изм. состояния:     %s\n", buf);
-    strftime (buf,80,"%x %X %Z",localtime(&st.st_atime));
+    strftime (buf,sizeof(buf),"%x %X %Z",localtime(&st.st_atime));
     printf("Посл. доступ к файлу:     %s\n", buf);
-    strftime (buf,80,"%x %X %Z",localtime(&st.st_mtime));
+    strftime (buf,sizeof(buf),"%x %X %Z",localtime(&st.st_mtime));
     printf("Посл. изм. файла:         %s\n", buf);
 
     exit(EXIT_SUCCESS);
